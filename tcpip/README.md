@@ -14,3 +14,7 @@ make sure to symlink it at root.
 ```bash
 ln -s build/compile_commands.json compile_commands.json
 ```
+
+```bash
+alias tun-dev='docker run -it --rm --cap-add=NET_ADMIN --device=/dev/net/tun -v $(pwd):/workspace -w /workspace ubuntu:22.04 bash'
+```
