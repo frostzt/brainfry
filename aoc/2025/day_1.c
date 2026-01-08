@@ -2,6 +2,7 @@
 // 1. The dial starts by pointing at 50.
 // 2. The actual password is the number of times the dial is left
 //    pointing at 0 after any rotation in the sequence.
+// 3. count the number of times any click causes the dial to point at 0
 
 #include <stddef.h>
 #include <stdio.h>
@@ -536,6 +537,11 @@ char *input_sequence[] = {
     "L28",  "L34",  "R14",  "L28",  "L28",  "R6",   "R23",  "L28",  "R33",
     "L19",  "R6",   "L22",  "R42",  "L14",  "L41",  "L5"};
 
+// char* input_sequence[] = {"L50", "L100", "L100", "R100", "R100"};
+
+// char *input_sequence[] = {"L68", "L30", "R48", "L5",  "R60",
+                          // "L55", "L1",  "L99", "R14", "L82"};
+
 int parse_number(char *char_ptr) {
   int str_length = strlen(char_ptr);
   char subbuf[str_length];
@@ -550,18 +556,29 @@ int main() {
   int dial = 50;
   for (int i = 0; i < length; i++) {
     int turn = parse_number(input_sequence[i]);
+
+    // caculate full circle rotations
+    int remainder = turn % 100;
+    int nearest_zero = turn - remainder;
+    int extra_zeroes = nearest_zero / 100;
+    answer += extra_zeroes;
+
     if (input_sequence[i][0] == 'L') {
+      if (dial != 0 && dial - remainder <= 0) {
+        answer++;
+      }
+
       dial = (dial - turn) % 100;
       if (dial < 0) {
         dial += 100;
       }
     } else {
+      if (dial + remainder >= 100) {
+        answer++;
+      }
+
       dial += turn;
       dial %= 100;
-    }
-
-    if (dial == 0) {
-      answer++;
     }
   }
 
