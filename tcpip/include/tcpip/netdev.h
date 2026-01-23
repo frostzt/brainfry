@@ -1,5 +1,5 @@
-#ifndef TCPIP_NETDEV_HPP
-#define TCPIP_NETDEV_HPP
+#ifndef TCPIP_NETDEV_H
+#define TCPIP_NETDEV_H
 
 /*
  * netdev.h - TUN/TAP Abstraction
@@ -45,10 +45,11 @@ struct netdev {
 /* allocates a new tun device and opens it */
 struct netdev *netdev_open(const char *dev, int flags);
 
+/* reads into buffer from the net device */
 ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len);
 
 ssize_t netdev_write(struct netdev *dev, const uint8_t *buf, size_t len);
 
 void netdev_close(struct netdev *dev);
 
-#endif // TCPIP_NETDEV_HPP
+#endif // TCPIP_NETDEV_H

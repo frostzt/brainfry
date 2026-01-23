@@ -36,14 +36,41 @@ struct netdev *netdev_open(const char *dev, int flags) {
   struct netdev *nd = (struct netdev *)malloc(sizeof(struct netdev));
   nd->fd = fd;
   if (*dev) {
-    /* figured this out the hard way if you're using OS default this would be
-     * empty and the logs you'll get will be empty */
-    strncpy(nd->dev, dev, IFNAMSIZ);
+    strncpy(nd->dev, ifr.ifr_name, IFNAMSIZ);
+    nd->dev[IFNAMSIZ - 1] = '\0';
   }
-  nd->mtu = 0;
+
+  int socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if ((err = ioctl(socket_fd, SIOCGIFMTU, (void *)&ifr)) < 0) {
+    DEBUG_ERROR("ioctl(SIOCGIFMTU) failed: %s", strerror(errno));
+    perror("ioctl(SIOCGIFMTU)");
+    close(fd);
+    return NULL;
+  }
+
+  nd->mtu = ifr.ifr_mtu;
 
   DEBUG_INFO("Successfully created netdev '%s' (fd=%d)", ifr.ifr_name, fd);
+  DEBUG_INFO("MTU set to: %d\n", nd->mtu);
   return nd;
+}
+
+ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len) {
+  if (dev == NULL) {
+    DEBUG_ERROR("Attempted to read from an NULL netdev");
+    perror("netdev_read()");
+    return -1;
+  }
+
+  ssize_t nread = read(dev->fd, buf, len);
+  if (nread < 0) {
+    DEBUG_ERROR("Failed to read from interface");
+    perror("reading from interface()");
+    return nread;
+  }
+
+  DEBUG_INFO("Read %d bytes from %s\n", nread, dev->dev);
+  return nread;
 }
 
 void netdev_close(struct netdev *dev) {

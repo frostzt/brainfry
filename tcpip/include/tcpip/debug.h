@@ -1,5 +1,5 @@
-#ifndef TCPIP_DEBUG_HPP
-#define TCPIP_DEBUG_HPP
+#ifndef TCPIP_DEBUG_H
+#define TCPIP_DEBUG_H
 
 #include <time.h>
 #include <stdio.h>
@@ -47,4 +47,4 @@ void debug_hexdump(log_level_t level, const void *buf, size_t len,
 #define COLOR_ERROR  "\x1b[31m"  // Red
 #define COLOR_RESET  "\x1b[0m"   // Reset
 
-#endif // TCPIP_DEBUG_HPP
+#endif // TCPIP_DEBUG_H

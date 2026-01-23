@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+
 #include "tcpip/debug.h"
 #include "tcpip/netdev.h"
 
@@ -14,7 +19,13 @@ int main() {
   }
 
   /* allocate a buffer to read into */
-  char buf[1500];
+  uint8_t buf[nd->mtu];
+  while (1) {
+    if (netdev_read(nd, buf, nd->mtu) < 0) {
+      DEBUG_ERROR("Failed to read from TUN device");
+      exit(1);
+    }
+  }
 
   /* close the netdev device */
   netdev_close(nd);
