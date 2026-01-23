@@ -22,6 +22,7 @@ endif()
 add_library(tcpip_core STATIC
   src/debug.c
   src/netdev.c
+  src/ip.c
 )
 
 target_include_directories(tcpip_core PUBLIC include)

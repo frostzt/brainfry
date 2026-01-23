@@ -50,6 +50,7 @@ ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len);
 
 ssize_t netdev_write(struct netdev *dev, const uint8_t *buf, size_t len);
 
+/* closes the device */
 void netdev_close(struct netdev *dev);
 
 #endif // TCPIP_NETDEV_H

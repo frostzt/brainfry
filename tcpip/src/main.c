@@ -5,6 +5,7 @@
 
 #include "tcpip/debug.h"
 #include "tcpip/netdev.h"
+#include "tcpip/ip.h"
 
 int main() {
   DEBUG_LOG("TCP/IP stack starting...");
@@ -25,6 +26,9 @@ int main() {
       DEBUG_ERROR("Failed to read from TUN device");
       exit(1);
     }
+
+    struct IpPacket *packet = ip_parse(buf);
+    print_ip_packet(packet);
   }
 
   /* close the netdev device */
