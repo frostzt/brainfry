@@ -106,9 +106,9 @@ ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len) {
     return nread;
   }
 
-  if (nread > 0) {
-    DEBUG_HEXDUMP(buf, nread, "Received packet:");
-  }
+  // if (nread > 0) {
+  //   DEBUG_HEXDUMP(buf, nread, "Received packet:");
+  // }
 
   DEBUG_INFO("Read %d bytes from %s\n", nread, dev->dev);
   return nread;

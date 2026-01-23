@@ -22,13 +22,16 @@ int main() {
   /* allocate a buffer to read into */
   uint8_t buf[nd->mtu];
   while (1) {
-    if (netdev_read(nd, buf, nd->mtu) < 0) {
+    ssize_t bytes_read = netdev_read(nd, buf, nd->mtu);
+    if (bytes_read < 0) {
       DEBUG_ERROR("Failed to read from TUN device");
       exit(1);
     }
+    
+    ip_packet_t ip;
+    ip_parse(buf, bytes_read, &ip);
 
-    struct IpPacket *packet = ip_parse(buf);
-    print_ip_packet(packet);
+    print_ip_packet(&ip);
   }
 
   /* close the netdev device */
