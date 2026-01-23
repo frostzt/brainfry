@@ -13,12 +13,14 @@ add_compile_options(
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address,undefined)
+  add_compile_definitions(DEBUG)
 endif()
 
 # -----------------------------
 # Core Library
 # -----------------------------
 add_library(tcpip_core STATIC
+  src/debug.c
   src/netdev.c
 )
 
