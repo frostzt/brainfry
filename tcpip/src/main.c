@@ -6,6 +6,7 @@
 #include "tcpip/debug.h"
 #include "tcpip/netdev.h"
 #include "tcpip/ip.h"
+#include "tcpip/icmp.h"
 
 int main() {
   DEBUG_LOG("TCP/IP stack starting...");
@@ -28,10 +29,12 @@ int main() {
       exit(1);
     }
     
+    /* parse the ip packet */
     ip_packet_t ip;
-    ip_parse(buf, bytes_read, &ip);
+    if (ip_parse(buf, bytes_read, &ip) != 0) continue;
 
     print_ip_packet(&ip);
+    handle_icmp(buf + ip.header_len_bytes, &ip);
   }
 
   /* close the netdev device */

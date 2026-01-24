@@ -21,8 +21,9 @@ endif()
 # -----------------------------
 add_library(tcpip_core STATIC
   src/debug.c
-  src/netdev.c
+  src/icmp.c
   src/ip.c
+  src/netdev.c
 )
 
 target_include_directories(tcpip_core PUBLIC include)

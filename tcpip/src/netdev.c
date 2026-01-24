@@ -94,7 +94,7 @@ struct netdev *netdev_open(const char *dev, int flags) {
 
 ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len) {
   if (dev == NULL) {
-    DEBUG_ERROR("Attempted to read from an NULL netdev");
+    DEBUG_ERROR("Attempted to read from a NULL netdev");
     perror("netdev_read()");
     return -1;
   }
@@ -112,6 +112,23 @@ ssize_t netdev_read(struct netdev *dev, uint8_t *buf, size_t len) {
 
   DEBUG_INFO("Read %d bytes from %s\n", nread, dev->dev);
   return nread;
+}
+
+ssize_t netdev_write(struct netdev *dev, const uint8_t *buf, size_t len) {
+  if (dev == NULL) {
+    DEBUG_ERROR("Attempted to write to a NULL netdev");
+    perror("netdev_write()");
+    return -1;
+  }
+
+  ssize_t nwritten = write(dev->fd, buf, len);
+  if (nwritten != (ssize_t)len) {
+    DEBUG_ERROR("Failed to write to fd");
+    perror("netdev_write()");
+    return -1;
+  }
+
+  return 1;
 }
 
 void netdev_close(struct netdev *dev) {

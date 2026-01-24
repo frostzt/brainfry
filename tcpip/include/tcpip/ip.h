@@ -30,6 +30,14 @@ typedef struct {
   uint8_t header_len_bytes;
 } ip_packet_t;
 
+/* Protocol numbers
+ * Note: do not use IPPROTO_ prefix as that collides netinet */
+typedef enum {
+  PROTO_ICMP = 1,
+  PROTO_TCP = 6,
+  PROTO_UDP = 17,
+} ip_proto_t;
+
 /* parses an ip packet buffer and sets it to the passed buffer
  * if success the returned number is 1 otherwise its less than 1
  *
