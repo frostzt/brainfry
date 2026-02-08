@@ -6,6 +6,8 @@
 #include <SDL_render.h>
 #include <iostream>
 
+#include "tanks/tank.hpp"
+
 constexpr uint32_t HEIGHT = 800;
 constexpr uint32_t WIDTH = 600;
 
@@ -32,7 +34,9 @@ int main() {
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
         quit = true;
-      } else if (e.type == SDL_KEYDOWN) {}
+      } else if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) {
+        entity::action_move_tank(e);
+      }
     }
 
     /* clear screen and set to black */
