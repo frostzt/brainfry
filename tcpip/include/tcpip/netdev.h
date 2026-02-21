@@ -1,12 +1,12 @@
-#ifndef TCPIP_NETDEV_H
-#define TCPIP_NETDEV_H
-
 /*
  * netdev.h - TUN/TAP Abstraction
  *
  * Author: frostzt
  * Date: 2026-01-04
  */
+
+#ifndef TCPIP_NETDEV_H
+#define TCPIP_NETDEV_H
 
 /*
  * Logic here is mostly implemented with help of official Linux Kernal docs

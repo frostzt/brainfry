@@ -7,10 +7,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(
     -Wall -Wextra -Werror -Wpedantic
-    -O0 -g
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_compile_options(-O0 -g)
   add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address,undefined)
   add_compile_definitions(DEBUG)

@@ -1,4 +1,5 @@
 #include "tcpip/debug.h"
+#include "tcpip/algo.h"
 #include "tcpip/ip.h"
 
 int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out) {
@@ -14,6 +15,7 @@ int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out) {
   /* 1st byte: version and ihl */
   uint8_t v = buf[0] >> 4;
   uint8_t ihl = buf[0] & 0x0F;
+  if (ihl < 5) return -15;
   uint8_t header_len_bytes = ihl * 4;
 
   /* 3rd + 4th byte: total length */
@@ -59,9 +61,29 @@ int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out) {
   return 0;
 }
 
+void ip_compute_checksum(uint8_t *buf, size_t n) {
+  buf[10] = buf[11] = 0x00;
+  uint16_t checksum = ones_complement_checksum(buf, n);
+  buf[10] = (uint8_t)(checksum >> 8);
+  buf[11] = (uint8_t)(checksum & 0xFF);
+}
+
+ssize_t switch_ip_addresses(uint8_t *buf) {
+  /* 13th + 14th + 15th + 16th byte: src addr */
+  uint32_t src_addr = ((uint32_t)buf[12] << 24) | ((uint32_t)buf[13] << 16) | ((uint32_t)buf[14] << 8) | buf[15];
+  /* copy destination addres into src addr */
+  memcpy(buf + 12, buf + 16, 4);
+  /* move src addrs into dst */
+  buf[16] = (uint8_t)(src_addr >> 24);
+  buf[17] = (uint8_t)(src_addr >> 16);
+  buf[18] = (uint8_t)(src_addr >> 8);
+  buf[19] = (uint8_t)src_addr;
+  return 0;
+}
+
 /* Converts a possible ipv4 number to ipv4 string
  * DO NOT FORGET TO CALL FREE */
-char *ipv4_to_string(int ipv_number) {
+char *ipv4_to_string(uint32_t ipv_number) {
   int a = (ipv_number >> 24) & 0xFF;
   int b = (ipv_number >> 16) & 0xFF;
   int c = (ipv_number >> 8) & 0xFF;

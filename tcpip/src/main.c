@@ -33,8 +33,22 @@ int main() {
     ip_packet_t ip;
     if (ip_parse(buf, bytes_read, &ip) != 0) continue;
 
+#ifdef DEBUG
     print_ip_packet(&ip);
-    handle_icmp(buf + ip.header_len_bytes, &ip);
+#endif
+
+    /* TODO: This guy should be conditional */
+    /* Handle ICMP Response */
+    if (handle_icmp(buf, &ip) < 0) {
+      DEBUG_ERROR("Failed to build an icmp message");
+      continue;
+    }
+
+    /* recompute checksum for ip */
+    ip_compute_checksum(buf, ip.header_len_bytes);
+
+    DEBUG_INFO("Writing back...");
+    netdev_write(nd, buf, ip.ip_total_length);
   }
 
   /* close the netdev device */

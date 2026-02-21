@@ -8,26 +8,18 @@
 #ifndef TCPIP_ICMP_H
 #define TCPIP_ICMP_H
 
+#include <assert.h>
+#include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /* handle ICMP request */
-void handle_icmp(uint8_t *buf, ip_packet_t *ip);
+ssize_t handle_icmp(uint8_t *buf, ip_packet_t *ip);
 
-void icmp_handle_echo(uint8_t *buf, int payload_length);
+/* handles echo replies to icmp, uses the buffer provided updates everything in-place */
+ssize_t icmp_handle_echo(uint8_t *buf, size_t payload_length);
 
-/*
-  -- FROM RFC 792
-  Checksum
-  The checksum is the 16-bit ones's complement of the one's
-  complement sum of the ICMP message starting with the ICMP Type.
-  For computing the checksum , the checksum field should be zero.
-  If the total length is odd, the received data is padded with one
-  octet of zeros for computing the checksum.  This checksum may be
-  replaced in the future.
-  -- FROM RFC 792
-*/
-void compute_icmp_checksum(uint8_t *buf, int n);
-
-void build_icmp_reply(uint8_t *buf_in, uint8_t *buf_out, size_t n);
+/* builds the icmp reply */
+ssize_t build_icmp_reply(uint8_t *buf, size_t n);
 
 #endif // TCPIP_ICMP_H

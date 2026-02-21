@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 /* A struct depicting IP Packet only the stuff I need though
@@ -22,12 +23,12 @@ typedef struct {
   int ip_ihl; /* Internet header length, this guys tells us how long the ip header is */
   int ip_total_length; /* total length of this buffer */
   int ip_protocol; /* protocol */
-  int ip_src_addr;
-  int ip_dst_addr;
+  int ip_src_addr; /* src address */
+  int ip_dst_addr; /* destination address */
 
-  const uint8_t* payload;
+  const uint8_t* payload; /* whatever is in the payload */
   uint16_t payload_len;
-  uint8_t header_len_bytes;
+  uint8_t header_len_bytes; /* bytes that are just ip header */
 } ip_packet_t;
 
 /* Protocol numbers
@@ -50,5 +51,10 @@ int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out);
 
 /* prints a provided ip packet */
 void print_ip_packet(ip_packet_t *packet);
+
+/* switches src address and dst address in a buffer */
+ssize_t switch_ip_addresses(uint8_t *buf);
+
+void ip_compute_checksum(uint8_t *buf, size_t n);
 
 #endif // TCPIP_IP_H

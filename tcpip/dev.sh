@@ -40,9 +40,8 @@ docker run -it --rm \
     --name $CONTAINER_NAME \
     $IMAGE_NAME bash -c "
         echo '=== TUN/TAP Dev Environment ==='
-        echo 'Run these commands:'
-        echo '  cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -B build'
-        echo '  cd build && make'
-        echo ''
+        echo 'ip addr add 10.0.0.1/24 dev tun0'
+        echo 'ip link set tun0 up'
+        echo 'ping -c 1 10.0.0.2'
         exec bash
     "
