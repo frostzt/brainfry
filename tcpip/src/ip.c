@@ -2,11 +2,8 @@
 #include "tcpip/algo.h"
 #include "tcpip/ip.h"
 
-int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out) {
-  if (buf == NULL) {
-    return -1;
-  }
-
+ssize_t ip_parse(uint8_t *buf, size_t n, ip_packet_t *out) {
+  if (buf == NULL) return -1;
   if (n < 20) {
     DEBUG_ERROR("Error packet too short");
     return -11;
@@ -97,6 +94,16 @@ char *ipv4_to_string(uint32_t ipv_number) {
 
   snprintf(src_addr, 16, "%d.%d.%d.%d", a, b, c, d);
   return src_addr;
+}
+
+ssize_t ip_send_reply(uint8_t *buf, size_t header_length, size_t total_length, struct netdev *nd) {
+  if (nd == NULL || buf == NULL) return -1;
+  if (header_length < 20 || total_length < 20) return -1;
+
+  /* recompute checksum and write back */
+  ip_compute_checksum(buf, header_length);
+  if (netdev_write(nd, buf, total_length) < 0) return -1;
+  return 0;
 }
 
 void print_ip_packet(ip_packet_t *packet) {

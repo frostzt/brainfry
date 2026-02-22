@@ -16,6 +16,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <tcpip/netdev.h>
+
 /* A struct depicting IP Packet only the stuff I need though
  * Made this through RFC-791 */
 typedef struct {
@@ -47,7 +49,7 @@ typedef enum {
  * ERR_PACKET_MALFORMED = -13
  * ERR_INVALID_IP_VERSION = -14
  */
-int ip_parse(uint8_t *buf, size_t n, ip_packet_t *out);
+ssize_t ip_parse(uint8_t *buf, size_t n, ip_packet_t *out);
 
 /* prints a provided ip packet */
 void print_ip_packet(ip_packet_t *packet);
@@ -55,6 +57,13 @@ void print_ip_packet(ip_packet_t *packet);
 /* switches src address and dst address in a buffer */
 ssize_t switch_ip_addresses(uint8_t *buf);
 
+/* computes ip checksum */
 void ip_compute_checksum(uint8_t *buf, size_t n);
+
+/* converts a uint32_t ipv4 address to its native representation */
+char *ipv4_to_string(uint32_t ipv_number);
+
+/* replies back */
+ssize_t ip_send_reply(uint8_t *buf, size_t header_length, size_t total_length, struct netdev *nd);
 
 #endif // TCPIP_IP_H

@@ -20,35 +20,50 @@ int main() {
     exit(1);
   }
 
-  /* allocate a buffer to read into */
+  /* allocate a buffer to read into and output with */
   uint8_t buf[nd->mtu];
+  uint8_t output[nd->mtu];
   while (1) {
     ssize_t bytes_read = netdev_read(nd, buf, nd->mtu);
     if (bytes_read < 0) {
       DEBUG_ERROR("Failed to read from TUN device");
       exit(1);
     }
-    
+
     /* parse the ip packet */
     ip_packet_t ip;
     if (ip_parse(buf, bytes_read, &ip) != 0) continue;
 
 #ifdef DEBUG
+    /* DEBUG: Print the ip header */
     print_ip_packet(&ip);
 #endif
 
-    /* TODO: This guy should be conditional */
-    /* Handle ICMP Response */
-    if (handle_icmp(buf, &ip) < 0) {
-      DEBUG_ERROR("Failed to build an icmp message");
+    /* copy buffer from buf to output buffer the output
+     * buffer will be modified in place */
+    memcpy(output, buf, ip.ip_total_length);
+
+    ssize_t reply = 0;
+    switch (ip.ip_protocol) {
+      case PROTO_ICMP: reply = handle_icmp(output, &ip); break;
+      default: continue;
+    }
+
+    if (reply != 0) {
+      DEBUG_ERROR("failed to build protocol: %d message\n", ip.ip_protocol);
       continue;
     }
 
-    /* recompute checksum for ip */
-    ip_compute_checksum(buf, ip.header_len_bytes);
+#ifdef DEBUG
+    /* DEBUG: Parse ip source address */
+    char* ipvstr = ipv4_to_string(ip.ip_src_addr);
+    DEBUG_INFO("Writing back to %s", ipvstr);
+    free(ipvstr);
+#endif
 
-    DEBUG_INFO("Writing back...");
-    netdev_write(nd, buf, ip.ip_total_length);
+    if (ip_send_reply(output, ip.header_len_bytes, ip.ip_total_length, nd) < 0) {
+      fprintf(stderr, "failed to reply back...");
+    }
   }
 
   /* close the netdev device */
